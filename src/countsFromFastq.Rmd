@@ -1,0 +1,175 @@
+---
+title: "Download fastq files and make a count matrix"
+author: "Stephanie Hickey"
+date: "2024-07-23"
+output: html_document
+---
+
+## Outline
+
+In this section you will:    
+
+  * Use the `prefetch` and `fasterq dump` functions from the  [SRA-toolkit](https://github.com/ncbi/sra-tools/wiki/08.-prefetch-and-fasterq-dump) to download fastq files from the SRA.   
+  * Use `kb ref` to download the pre-made mouse reference index.    
+  * Use `kb-count` to get cell by gene count data.    
+  * Use `wget` to download processed data from GEO.   
+
+## Data download
+
+We'll use raw data from [Lukassen et al. *Single-cell RNA sequencing of adult mouse testes*](https://www.nature.com/articles/sdata2018192#Sec11) which is deposited in the SRA ([SRP119327](https://www.ncbi.nlm.nih.gov/sra/SRP119327)). There is one entry for each mouse with three different files per mouse.    
+
+  * Mouse 1: [SRR6129050](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR6129050&display=metadata)   
+  * Mouse 2: [SRR6129051](https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR6129051&display=metadata)
+
+To do this on hpc we'll use the `prefetch` and `fasterq dump` functions from the  [SRA-toolkit](https://github.com/ncbi/sra-tools/wiki/08.-prefetch-and-fasterq-dump).
+```{bash, eval=FALSE}
+# make a subfolder for this data in scratch
+mkdir $SCRATCH/BCC105_scRNAseq_training/
+mkdir $SCRATCH/BCC105_scRNAseq_training/raw_data/
+mkdir $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes
+```
+
+**Do not run this example** The following script is in the slurm submission file `prefetch_fasterq_dump.sh`. 
+```{bash, eval=FALSE}
+# load the SRA-toolkit module
+module purge
+module load SRA-Toolkit/3.0.10-gompi-2023a
+
+# save the sra file to the appropriate data directory
+prefetch SRR6129050 -O $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes
+
+prefetch SRR6129051 -O $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes
+
+# extract the fastq files from the sra file
+cd $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes
+fasterq-dump SRR6129050
+fasterq-dump SRR6129051
+```
+
+Because it can take a long time, it's best to submit this code as a job to slurm. Just open `prefetch_fasterq_dump.sh` and modify the code before running.
+```{bash, eval=FALSE}
+# set your working directory
+WORK=/mnt/research/bioinformaticsCore/projects/petroffm/BCC105_scRNAseq_training
+
+# make a `run` folder to hold the output files generated
+# when you run your code
+mkdir $WORK/run
+
+cd $WORK/run
+sbatch $WORK/src/prefetch_fasterq_dump.sh
+```
+
+## Get counts with Kallisto | bustools
+
+[Kallisto | bustools (kb)](https://www.kallistobus.tools) is a suite of tools designed for the efficient and accurate quantification of single-cell RNA-seq data. It combines the speed of Kallisto, a pseudo-alignment tool, with the power of Bustools, which handles the processing of barcodes and UMIs (Unique Molecular Identifiers)
+
+### Use `kb ref` to download the pre-made mouse reference index
+
+The standard index is packaged with the following two files:
+
+  * `index.idx`: The kallisto index that reads will be pseudoaligned against.   
+  * `t2g.txt`: A file containing the transcript-to-gene mapping.    
+
+Arguments:    
+
+  * `-i`: What you want to name index.idx.   
+  * `-g`: What you want to name t2g.txt.    
+  * `-d`: The name of the pre-built kallisto index you want to download.
+
+Get more information about the pre-made indices [here](https://github.com/pachterlab/kallisto-transcriptome-indices/blob/master/README.md). You can also use this function to [build your own index](https://pachterlab.github.io/kallistobustools/tutorials/kb_custom_index/python/kb_transcriptome_index/). You only need to do this once per genome.
+
+```{bash, eval=FALSE}
+# load the Conda module
+module purge
+module load Conda/3
+
+# if you haven't already
+cd $WORK/data
+kb ref -i kallisto_mouse.idx -g kallisto_mouse_t2g.txt -d mouse 
+```
+
+### Use `kb-count` to get cell by gene count data
+
+[`kb-count`](https://pachterlab.github.io/kallistobustools/kb_usage/kb_count/) is a flexible pseudoaligner that works with many single-cell RNA-seq technologies. 
+
+To see all of the parameters for running `kb-count`, click the link above or run:
+```{bash, eval=FALSE}
+kb count -h 
+```
+
+To list the technologies it supports run the following command:
+```{bash, eval=FALSE}
+kb --list
+```
+
+10X Chromium 3' v2 chemistry was used to generate the testis data, so we'll use `-x 10XV2` to specify this.
+
+Make folders in `$WORK/data` to hold the `kb count` output for each sample
+```{bash, eval=FALSE}
+# paper dir
+mkdir $WORK/data/Lukassen_testes
+
+# mouse1
+mkdir $WORK/data/Lukassen_testes/SRR6129050_mouse1
+
+# mouse2
+mkdir $WORK/data/Lukassen_testes/SRR6129051_mouse2
+```
+
+**`kb-count` Arguments**
+
+  * `-o`: Output directory, the folder where you want the count data to go.    
+  * `-t`: Threads for running in parallel. Must be <= `--cpus-per-task` in the slurm submssion file.    
+  * `-i` Path to kallisto index/indices, comma-delimited.
+  * `-g` Path to transcript-to-gene mapping.
+  * `-x` Single-cell technology used (`kb --list` to view).
+  * `--filter` used to filter out barcodes with low UMI counts.
+  * Forward and reverse `fastq` files are listed at the end.
+
+**Do not run this example** The following script is in the slurm submission file `mouse1_kb_count.sh`. 
+```{bash, eval=FALSE}
+# load the conda module 
+module purge
+module load Conda/3
+
+kb count \
+  -o $WORK/data/Lukassen_testes/SRR6129050_mouse1 \
+  -t 32 \
+  -i $WORK/data/kallisto_mouse.idx  \
+  -g $WORK/data/kallisto_mouse_t2g.txt \
+  -x 10XV2 \
+  --filter \
+  $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes/SRR6129050_1.fastq \
+  $SCRATCH/BCC105_scRNAseq_training/raw_data/Lukassen_testes/SRR6129050_2.fastq 
+```
+
+Edit `mouse1_kb_count.sh` to replace the file paths with your own paths. Then submit `mouse1_kb_count.sh`:
+```{bash, eval=FALSE}
+cd $WORK/run
+sbatch $WORK/src/mouse1_kb_count.sh
+```
+
+Make a copy of `mouse1_kb_count.sh`, and edit it to run the script for mouse2. 
+
+Submit `mouse2_kb_count.sh`
+```{bash, eval=FALSE}
+cd $WORK/run
+sbatch $WORK/src/mouse2_kb_count.sh
+```
+
+## Alternative strategy: Get processed counts from GEO
+
+If the processed counts from the paper are already available, use those instead. For Lukassen et al., the cout matrix, genes, and cell barcodes are under [GSE104556](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE104556).
+
+```{bash, eval=FALSE}
+cd $WORK/data/Lukassen_testes
+
+# this will download all of the .gz files under `Supplementary File`
+# this template works for downloading any suppl file 
+# from GEO
+wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE104nnn/GSE104556/suppl/*.gz
+```
+
+## Up Next
+
+Part2: [Analyze the count data in R](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/bioconductor_scRNAseq_analysis.html)
