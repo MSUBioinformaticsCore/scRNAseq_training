@@ -10,8 +10,7 @@ In this tutorial you will use the Kallisto | bustools workflow to perform pseudo
   - Use `kb ref` from the [kallisto | bustools](https://www.kallistobus.tools) workflow to download the pre-made mouse reference index.    
   - Use `kb-count`  from the [kallisto | bustools](https://www.kallistobus.tools) to get cell by gene count data.  
   - Use `wget` to download processed data from GEO.   
-  - Part1 [Tutorial](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/countsFromFastq.html)
-  - [test](https://msubioinformaticscore.github.io/scRNAseq_training/html/countsFromFastq.html)
+  - Part1 [Tutorial](https://msubioinformaticscore.github.io/scRNAseq_training/html/countsFromFastq.html)
 - **Part2**: Analyze the count data in R. 
   - Make a `SingleCellExperiment` object from count data derived from.   `Kaslisto-Bustools` or processed counts downloaded from GEO.    
   - Detect empty droplets with `DropletUtils`.    
@@ -25,7 +24,7 @@ In this tutorial you will use the Kallisto | bustools workflow to perform pseudo
   - Assign cell labels from gene sets.    
   - Calculate mean gene expression per clusters or cell type.   
   - Visualize your results.  
-  - Part2 [Tutorial](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/bioconductor_scRNAseq_analysis.html)
+  - Part2 [Tutorial](https://msubioinformaticscore.github.io/scRNAseq_training/html/bioconductor_scRNAseq_analysis.html)
 
 ------------------------------------------------------------------------
 
@@ -82,14 +81,14 @@ BiocManager::install(c("SingleCellExperiment", "scater",
 
 ## Part1: Get a count matrix from fastq files
 
- - [html](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/countsFromFastq.html)
+ - [html](https://msubioinformaticscore.github.io/scRNAseq_training/html/countsFromFastq.html)
  - [Rmarkdown](https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/src/countsFromFastq.Rmd)
 
 ------------------------------------------------------------------------
 
 ## Part2: Analyze the count data in R
 
- - [html](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/bioconductor_scRNAseq_analysis.html)
+ - [html](https://msubioinformaticscore.github.io/scRNAseq_training/html/bioconductor_scRNAseq_analysis.html)
  - [Rmarkdown](https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/src/bioconductor_scRNAseq_analysis.Rmd)
 
 ------------------------------------------------------------------------
