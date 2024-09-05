@@ -24,7 +24,7 @@ In this tutorial you will use the Kallisto | bustools workflow to perform pseudo
   - Assign cell labels from gene sets.    
   - Calculate mean gene expression per clusters or cell type.   
   - Visualize your results.  
-  - Part2 [Tutorial](https://msobioinformatics.github.io/scRNAseq_training/html/countsFromFastq.html)
+  - Part2 [Tutorial](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/bioconductor_scRNAseq_analysis.html)
 
 ------------------------------------------------------------------------
 
