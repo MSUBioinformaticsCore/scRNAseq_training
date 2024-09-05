@@ -11,6 +11,7 @@ In this tutorial you will use the Kallisto | bustools workflow to perform pseudo
   - Use `kb-count`  from the [kallisto | bustools](https://www.kallistobus.tools) to get cell by gene count data.  
   - Use `wget` to download processed data from GEO.   
   - Part1 [Tutorial](https://html-preview.github.io/?url=https://github.com/MSUBioinformaticsCore/scRNAseq_training/blob/main/html/countsFromFastq.html)
+  - [test](https://msubioinformaticscore.github.io/scRNAseq_training/html/countsFromFastq.html)
 - **Part2**: Analyze the count data in R. 
   - Make a `SingleCellExperiment` object from count data derived from.   `Kaslisto-Bustools` or processed counts downloaded from GEO.    
   - Detect empty droplets with `DropletUtils`.    
