@@ -73,7 +73,7 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install(c("SingleCellExperiment", "scater",
-                     "scran", "DropletUtils", "bluster"s,
+                     "scran", "DropletUtils", "bluster",
                      "scDblFinder", "AUCell"))
 ```
 
