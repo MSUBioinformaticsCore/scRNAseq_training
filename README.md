@@ -1,6 +1,6 @@
 # scRNA-seq Data Analysis Tutorial
 
-In this tutorial you will use the Kallisto | bustools workflow to perform pseudo-alignment of scRNA-seq reads to a reference transcriptome and generate count matrices.  
+In this tutorial you will use the Kallisto | bustools workflow to perform pseudo-alignment of scRNA-seq reads to a reference transcriptome and generate count matrices. Then you will analyze the count data in R. 
 
 ------------------------------------------------------------------------
 ## Overview 
