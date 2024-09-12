@@ -30,14 +30,9 @@ In this tutorial you will use the Kallisto | bustools workflow to perform pseudo
 
 ## Set up
 
-### Copy workshop data
+### Download workshop data
 
-The data used in this workshop are all publicly available and the download links are included throughout the document. For efficiency's sake, you can copy the data from the Boinformatics Core `scratch` space into your `$HOME` directory or any other folder in your hpcc space.
-
-```
-cd /path/to/folder
-cp -r /mnt/scratch/bioinformaticsCore/data_transfer/BCC105_scRNAseq_training .
-```
+The data used in this workshop are all publicly available and the download links are included throughout the document. For efficiency's sake, you can dowload the data and code from Google Drive, [here](https://drive.google.com/drive/folders/1gfrdzceslLBtHPVnfB8sSIbV70rdvbkh?usp=drive_link). Log into [ondemand.hpcc.msu.edu](https://ondemand.hpcc.msu.edu) to upload the `scRNAseq_training` directory into your hpcc space.
 
 ### Install Anaconda
 
@@ -74,7 +69,7 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install(c("SingleCellExperiment", "scater",
                      "scran", "DropletUtils", "bluster",
-                     "scDblFinder", "AUCell"))
+                     "scDblFinder", "AUCell", "PCAtools"))
 ```
 
 ------------------------------------------------------------------------
